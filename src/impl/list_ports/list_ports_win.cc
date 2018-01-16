@@ -7,13 +7,18 @@
  * http://opensource.org/licenses/MIT
  */
 
-#include "serial/serial.h"
+#include "../../../include/serial/serial.h"
 #include <tchar.h>
 #include <windows.h>
 #include <setupapi.h>
 #include <initguid.h>
 #include <devguid.h>
 #include <cstring>
+
+//Hack:
+#ifndef GUID_DEVCLASS_PORTS
+    DEFINE_GUID(GUID_DEVCLASS_PORTS, 0x4D36E978, 0xE325, 0x11CE, 0xBF, 0xC1, 0x08, 0x00, 0x2B, 0xE1, 0x03, 0x18 );
+#endif
 
 using serial::PortInfo;
 using std::vector;
