@@ -70,7 +70,8 @@ Serial::SerialImpl::open ()
                     0,
                     0,
                     OPEN_EXISTING,
-                    FILE_ATTRIBUTE_NORMAL,
+                    // adding some extra flags to improve performance on bluetooth
+                    FILE_ATTRIBUTE_NORMAL | FILE_FLAG_NO_BUFFERING | FILE_FLAG_WRITE_THROUGH,
                     0);
 
   if (fd_ == INVALID_HANDLE_VALUE) {
