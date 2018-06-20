@@ -9,10 +9,22 @@ set(serial_SRCS
 )
 
 # If windows
-list(APPEND serial_SRCS src/impl/win.cc)
-list(APPEND serial_SRCS src/impl/list_ports/list_ports_win.cc)
-
+IF(WIN32)
+	list(APPEND serial_SRCS src/impl/win.cc)
+	list(APPEND serial_SRCS src/impl/list_ports/list_ports_win.cc)
+ELSE()
+	list(APPEND serial_SRCS src/impl/unix.cc)
+	list(APPEND serial_SRCS src/impl/list_ports/list_ports_linux.cc)
+ENDIF()
+	
 add_library(serialc STATIC ${serial_SRCS})
-target_link_libraries(serialc setupapi)
+
+IF(WIN32)
+	target_link_libraries(serialc setupapi)
+ELSE()
+	target_link_libraries(serialc)
+ENDIF()
+
+
 set_target_properties(serialc PROPERTIES PUBLIC_HEADER include/serial/serial.h)
 include_directories(include)
