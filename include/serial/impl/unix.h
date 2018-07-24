@@ -83,6 +83,12 @@ public:
   bool
   isOpen () const;
 
+  void 
+  openAsync();
+
+  state_t
+  getState() const;
+
   size_t
   available ();
 

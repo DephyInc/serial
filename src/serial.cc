@@ -31,6 +31,7 @@ using serial::bytesize_t;
 using serial::parity_t;
 using serial::stopbits_t;
 using serial::flowcontrol_t;
+using serial::state_t;
 
 class Serial::ScopedReadLock {
 public:
@@ -82,6 +83,12 @@ Serial::open ()
 {
   pimpl_->open ();
 }
+
+void 
+Serial::openAsync() { pimpl_->openAsync(); }
+
+state_t
+Serial::getState() const { return pimpl_->getState(); }
 
 void
 Serial::close ()

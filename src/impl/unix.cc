@@ -156,6 +156,18 @@ Serial::SerialImpl::open ()
   is_open_ = true;
 }
 
+void 
+Serial::SerialImpl::openAsync()
+{
+  open();
+}
+
+state_t
+Serial::SerialImpl::getState() const
+{
+  return is_open_ ? state_t::state_open : state_t::state_none; 
+}
+
 void
 Serial::SerialImpl::reconfigurePort ()
 {

@@ -3,6 +3,7 @@
 /* Copyright 2012 William Woodall and John Harrison */
 
 #include <sstream>
+#include <iostream>
 
 #include "serial/impl/win.h"
 
@@ -19,6 +20,7 @@ using serial::flowcontrol_t;
 using serial::SerialException;
 using serial::PortNotOpenedException;
 using serial::IOException;
+using serial::state_t;
 
 inline wstring
 _prefix_port_if_needed(const wstring &input)
@@ -38,9 +40,12 @@ Serial::SerialImpl::SerialImpl (const string &port, unsigned long baudrate,
   : port_ (port.begin(), port.end()), fd_ (INVALID_HANDLE_VALUE), is_open_ (false),
     baudrate_ (baudrate), parity_ (parity),
     bytesize_ (bytesize), stopbits_ (stopbits), flowcontrol_ (flowcontrol)
+    , port_state(state_t::state_none)
+    , worker_thread(NULL)
 {
   if (port_.empty () == false)
     open ();
+
   read_mutex = CreateMutex(NULL, false, NULL);
   write_mutex = CreateMutex(NULL, false, NULL);
 }
@@ -90,6 +95,56 @@ Serial::SerialImpl::open ()
 
   reconfigurePort();
   is_open_ = true;
+}
+
+
+void Serial::SerialImpl::syncOpen(VOID *p)
+{
+  SerialImpl* inst = (SerialImpl*)p;
+  inst->port_state = state_t::state_opening;
+  
+  try {
+    inst->open();
+  } catch (...) {}
+
+  inst->port_state = inst->is_open_ ? state_t::state_open : state_t::state_open_failed;    
+  return;
+}
+
+void
+Serial::SerialImpl::openAsync ()
+{
+  if(port_state != state_t::state_none && port_state != state_open_failed)
+  {
+    std::cout << "can't open from this state" << std::endl;
+    return;
+  }
+
+  if(port_.empty())
+  {
+      std::cout << "port name invalid (empty)...?" << std::endl;
+    return;
+  }
+
+  // wstring port_with_prefix = _prefix_port_if_needed(port_);
+  // filename_ = port_with_prefix.c_str();
+
+  port_state = state_t::state_opening;
+  worker_thread = CreateThread(
+      NULL,
+      0, 
+      (LPTHREAD_START_ROUTINE) syncOpen,
+      this,
+      0,
+      NULL
+    );
+
+}
+
+state_t
+Serial::SerialImpl::getState () const
+{
+  return port_state;
 }
 
 void
@@ -292,11 +347,19 @@ Serial::SerialImpl::close ()
     }
     is_open_ = false;
   }
+
+  port_state = state_t::state_none;
 }
 
 bool
 Serial::SerialImpl::isOpen () const
 {
+  if(is_open_ && worker_thread != NULL)
+  {
+    CloseHandle(worker_thread);
+    worker_thread = NULL;
+  }
+
   return is_open_;
 }
 
