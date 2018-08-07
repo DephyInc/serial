@@ -54,7 +54,7 @@ using serial::Serial;
 using serial::SerialException;
 using serial::PortNotOpenedException;
 using serial::IOException;
-
+using serial::state_t;
 
 MillisecondTimer::MillisecondTimer (const uint32_t millis)
   : expiry(timespec_now())
