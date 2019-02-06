@@ -4,8 +4,11 @@ project(serial)
 ## Sources
 set(serial_SRCS
     src/serial.cc
+	src/revision.cpp
     include/serial/serial.h
     include/serial/v8stdint.h
+	include/revision.h
+	include/git_rev_data.h
 )
 
 # If windows
