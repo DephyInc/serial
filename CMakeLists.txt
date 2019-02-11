@@ -28,12 +28,13 @@ ELSE()
 	target_link_libraries(serialc)
 ENDIF()
 
-## Update the git revision data file
-add_custom_command( TARGET serialc
-		PRE_BUILD
-		COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/update_revs.bat ${CMAKE_CURRENT_SOURCE_DIR}/include/git_rev_data.h
-		COMMENT "Updating revision information"
-		)
+## Force generation of the revision header file BEFORE building targets
+add_custom_target(
+    revisionTarget
+    COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/update_revs.bat ${CMAKE_CURRENT_SOURCE_DIR}/include/git_rev_data.h
+	COMMENT "Updating revision information"
+)
+add_dependencies(serialc revisionTarget)
 
 set_target_properties(serialc PROPERTIES PUBLIC_HEADER include/serial/serial.h)
 include_directories(include)
