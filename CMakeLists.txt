@@ -29,11 +29,23 @@ ELSE()
 ENDIF()
 
 ## Force generation of the revision header file BEFORE building targets
+##  Create a psuedo-target to be created before the library
+IF(WIN32)
 add_custom_target(
     revisionTarget
     COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/update_revs.bat ${CMAKE_CURRENT_SOURCE_DIR}/include/git_rev_data.h
-	COMMENT "Updating revision information"
+    COMMENT "Updating revision information"
 )
+
+ELSE()
+add_custom_target(
+   revisionTarget
+   COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/update_revs.sh ${CMAKE_CURRENT_SOURCE_DIR}/git-revision.py ${CMAKE_CURRENT_SOURCE_DIR}/include/git_rev_data.h
+   COMMENT "Updating revision information"
+)
+
+ENDIF()
+
 add_dependencies(serialc revisionTarget)
 
 set_target_properties(serialc PROPERTIES PUBLIC_HEADER include/serial/serial.h)
