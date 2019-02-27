@@ -41,8 +41,16 @@ HEADERS += \
     include/serial/v8stdint.h \
     include/git_rev_data.h \
     include/revision.h
+
 unix {
     target.path = /usr/lib
     INSTALLS += target
 }
 
+# Update revision information
+PRE_TARGETDEPS      += git_rev_data.h
+QMAKE_EXTRA_TARGETS += serialRevTarget
+serialRevTarget.target = git_rev_data.h
+win32: serialRevTarget.commands = cd $$PWD && python.exe $$PWD/git-revision.py -o $$PWD/include/git_rev_data.h
+else:  serialRevTarget.commands = python $$PWD/git-revision.py -o $$PWD/include/git_rev_data.h
+serialRevTarget.depends = FORCE
