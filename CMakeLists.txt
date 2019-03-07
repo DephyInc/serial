@@ -1,6 +1,11 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(serial)
 
+set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+
 ## Sources
 set(serial_SRCS
     src/serial.cc
@@ -13,7 +18,6 @@ IF(WIN32)
 	list(APPEND serial_SRCS src/impl/win.cc)
 	list(APPEND serial_SRCS src/impl/list_ports/list_ports_win.cc)
 ELSE()
-	add_compile_options(-fPIC -std=c++14)
 	list(APPEND serial_SRCS src/impl/unix.cc)
 	list(APPEND serial_SRCS src/impl/list_ports/list_ports_linux.cc)
 ENDIF()
