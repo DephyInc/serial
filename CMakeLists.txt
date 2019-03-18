@@ -4,8 +4,6 @@ file(GLOB_RECURSE SERIAL_SRCS
 	${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp
 )
 
-message(STATUS "SERIAL_SRCS: ${SERIAL_SRCS}")
-
 # Add the source to the parent project to create a overall library/DLL
 set(SERIAL_SRCS
 	${SERIAL_SRCS}
